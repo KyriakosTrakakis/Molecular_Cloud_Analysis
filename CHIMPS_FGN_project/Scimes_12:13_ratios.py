@@ -5,15 +5,6 @@ Created on Thu May  7 16:22:53 2026
 
 @author: kyriakos.trakakis
 """
-
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Tue Jan  6 14:49:13 2026
-
-@author: kyriakos.trakakis
-"""
-
 import numpy as np
 import matplotlib.pyplot as plt
 from astropy.io import fits
