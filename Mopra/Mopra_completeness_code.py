@@ -28,25 +28,51 @@ def run_command(command, cwd=None):
         print(result.stdout)
         
 N_LOOK = 4
-n_iter = 20
+n_iter = 200
 completeness_flux_final = []
 
-data_file = '/Users/kyriakos.trakakis/Downloads/Mopra_FGN_project/Mopra/13CO/G320-13CO_smallercube_05res.fits'
-data_injected = '/Users/kyriakos.trakakis/Downloads/Mopra_FGN_project/Mopra/13CO/G320-13CO_smallercube_05res_50_sources_injected.fits'
+test = "sensitivity"
 
-# === Makeclumps parameter list ===
-fwhm1 = "7"
-fwhm2 = "7"
-fwhm3 = "4"
-like_file = "G320-13CO_smallercube_05res_template.sdf"
-pardist = "normal"
-nclump = "50"
-peak = "[5, 0.5]"
-shape = "ellipse"
-lbnd = "[1,1,1000]"
-ubnd = "[122,242,1240]"
-vgrad1 = "[0,0]"
-vgrad2 = "[0,0]"
+if test == "completeness":
+    data_file = '/Users/kyriakos.trakakis/Downloads/Mopra_FGN_project/Mopra/13CO/G320-13CO_smallercube_05res.fits'
+    data_injected = '/Users/kyriakos.trakakis/Downloads/Mopra_FGN_project/Mopra/13CO/G320-13CO_smallercube_05res_50_sources_injected.fits'
+    
+    # === Makeclumps parameter list ===
+    fwhm1 = "7"
+    fwhm2 = "7"
+    fwhm3 = "4"
+    like_file = "G320-13CO_smallercube_05res_template.sdf"
+    pardist = "normal"
+    nclump = "50"
+    peak = "[4, 0.5]"
+    shape = "ellipse"
+    lbnd = "[1,1,1000]"
+    ubnd = "[122,242,1240]"
+    vgrad1 = "[0,0]"
+    vgrad2 = "[0,0]"
+    
+if test == "sensitivity":
+    data_file = '/Users/kyriakos.trakakis/Downloads/Mopra_FGN_project/Mopra/13CO/G320-13CO_smallercube_05res_rms.fits'
+    data_injected = '/Users/kyriakos.trakakis/Downloads/Mopra_FGN_project/Mopra/13CO/G320-13CO_smallercube_05res_rms_50_sources_injected.fits'
+    
+    # === Makeclumps parameter list ===
+    fwhm1 = "[3, 1]"
+    fwhm2 = "[3, 1]"
+    fwhm3 = "[3, 1.5]"
+    like_file = "G320-13CO_smallercube_05res_template.sdf"
+    pardist = "normal"
+    nclump = "50"
+    peak = "[2, 0.5]"
+    shape = "ellipse"
+    lbnd = "[1,1,1000]"
+    ubnd = "[122,242,1240]"
+    vgrad1 = "[0,0]"
+    vgrad2 = "[0,0]"
+    
+
+
+
+
 
 makeclumps_path = "/usr/local/star-2023A/bin/cupid/makeclumps"
 ndf2fits_path   = "/usr/local/star-2023A/bin/convert/ndf2fits"
@@ -190,7 +216,10 @@ for i in range(n_iter):
         init_globals={"filename": scimes_data_name}
     )
     
-    scimes_data_name = "/Users/kyriakos.trakakis/Downloads/Mopra_FGN_project/Mopra/13CO/G320-13CO_smallercube_05res_50_sources_injected"
+    if test == "completeness":
+        scimes_data_name = "/Users/kyriakos.trakakis/Downloads/Mopra_FGN_project/Mopra/13CO/G320-13CO_smallercube_05res_50_sources_injected"
+    elif test == "sensitivity":
+        scimes_data_name = '/Users/kyriakos.trakakis/Downloads/Mopra_FGN_project/Mopra/13CO/G320-13CO_smallercube_05res_rms_50_sources_injected'
     
     clusters_name = scimes_data_name + "_min_del_2_parallel_clusters.fits"
     clust, h_clust = fits.getdata(clusters_name, 0, header=True)
@@ -398,6 +427,19 @@ for i in range(n_iter):
 print(completeness_flux_final)
 
 
+def collapse_to_median(lst):
+    out = []
+    for x in lst:
+        if isinstance(x, (list, tuple, np.ndarray)):
+            arr = np.asarray(x, dtype=float).ravel()
+            out.append(np.nanmedian(arr) if arr.size else np.nan)
+        else:
+            out.append(x)
+    return out
+
+completeness_flux_final = collapse_to_median(completeness_flux_final)
+
+
 plt.figure()
 plt.plot(completeness_flux_final)
 plt.xlabel('Run number')
@@ -425,9 +467,14 @@ for median_sums, completeness in all_completeness_curves:
     )
 all_points = np.vstack(rows)
 
-s1 = int(fwhm1)
-p1 = int(peak[1])
-p2 = float(peak[4:7])
+if test == "completeness":
+    s1 = int(fwhm1[1])
+    p1 = int(peak[1])
+    p2 = float(peak[4:7])
+elif test == "sensitivity":
+    s1 = int(fwhm1[1])
+    p1 = int(peak[1])
+    p2 = float(peak[4:7])
 
 np.savetxt(
     f"Mopra_all_completeness_curves_10000_fwhm{s1}_peak{p1}_{p2}.csv", # 10000 sources, peak distribution [6,2]

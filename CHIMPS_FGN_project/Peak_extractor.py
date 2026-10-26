@@ -12,18 +12,19 @@ from astropy.io import fits
 import csv
 import os
 
-os.chdir('/Users/kyriakos.trakakis/Downloads/CHIMPS_COHRS/13CO')
+os.chdir('/Users/kyriakos.trakakis/Downloads/FUGIN_data/13CO')
 #os.chdir('/Users/kyriakos.trakakis/Downloads/Mopra_FGN_project/Mopra/13CO')
 
 
 # ------------------------------------------------------------------
 # File names
 # ------------------------------------------------------------------
-mask_file = "FGN_027_13CO_23arcsec_aligned_SNR_min_del_2_parallel_clusters.fits"
+#mask_file = "FGN_027_13CO_23arcsec_aligned_SNR_min_del_2_parallel_clusters.fits"
 #data_file = "FGN_017_027_13CO_23arcsec_aligned_SNR.fits" # Original code used SNR here
-data_file = "FGN_027_12_13_ratio_23arcsec_aligned.fits"
+data_file = "FGN_13CO_030_23arcsec_SNR_spline.fits"
+#data_file = "FGN_027_12_13_ratio_23arcsec_aligned.fits"
 #data_file = "G320-13CO_smallercube_05res.fits"
-#mask_file = "G320-13CO_smallercube_05res_min_del_2_parallel_clusters.fits"
+mask_file = "FGN_13CO_30_23arcsec_SNR_spline_min_del_2_parallel_clusters.fits"
 
 # ------------------------------------------------------------------
 # Read data
@@ -88,7 +89,7 @@ print(f"Number of valid peaks: {peak_values.size}")
 # Plot histogram
 # ------------------------------------------------------------------
 plt.figure()
-plt.hist(peak_values, bins=50)
+plt.hist(peak_values, bins=50, edgecolor = 'k')
 plt.xlabel("Peak value (SNR)")
 plt.xlabel('Peak Ratio within cloud')
 plt.ylabel("Number of structures")
@@ -100,14 +101,14 @@ plt.show()
 # ------------------------------------------------------------------
 # Save to csv
 # ------------------------------------------------------------------
-#out_csv = "FGN_027_parallel_peaks.csv"
-out_csv = "Mopra_320_parallel_peaks.csv"
+out_csv = "FGN_030_parallel_peaks.csv"
+#out_csv = "Mopra_320_parallel_peaks.csv"
 
-#with open(out_csv, "w", newline="") as f:
-#    writer = csv.writer(f)
-#    writer.writerow(["structure_id", "peak_value"])
+with open(out_csv, "w", newline="") as f:
+    writer = csv.writer(f)
+    writer.writerow(["structure_id", "peak_value"])
 
-#    for sid, peak in peaks.items():
-#        writer.writerow([sid, peak])
+    for sid, peak in peaks.items():
+        writer.writerow([sid, peak])
 
-#print(f"Saved peaks to {out_csv}")
+print(f"Saved peaks to {out_csv}")
